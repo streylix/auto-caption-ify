@@ -1,0 +1,76 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+.python-version
+
+# Video and Audio Files
+*.mp4
+*.avi
+*.mov
+*.wmv
+*.flv
+*.mkv
+*.wav
+*.mp3
+*.m4a
+*.aac
+
+# Temporary Files
+temp_audio.wav
+*_captioned.*
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.pydevproject
+.settings/
+
+# Whisper model files and cache
+*.pt
+.cache/
+whisper/
+
+# Log files
+*.log
+logs/
+log/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.coverage.*
+coverage.xml
+*.cover
