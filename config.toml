@@ -2,7 +2,7 @@
 # -----------------------------------------------------------------
 # number_of_words: Integer (1 or greater)
 #   Number of words to show at once
-number_of_words = 1
+number_of_words = 3
 
 # font: String
 #   Font filename (must be in the 'fonts' directory)
@@ -11,7 +11,7 @@ font = "andy"
 
 # font_size: Integer
 #   Size of the font in pixels
-font_size = 100
+font_size = "auto"
 
 # position: Flexible positioning
 #   Can be one of:
@@ -53,14 +53,14 @@ margin = [40, 40]
 
 # transition: Boolean
 #   Whether to use the zoom-in transition effect for new captions
-transition = false
+transition = true
 
 # Highlight options
 # -----------------------------------------------------------------
 # highlight: Boolean
 #   Whether to highlight the current word
 #   Only applies when number_of_words > 1
-highlight = false
+highlight = true
 
 # highlight_color: Hex color code
 #   Color for highlighted word

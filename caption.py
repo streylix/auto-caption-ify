@@ -9,6 +9,7 @@ from urllib.parse import quote
 import zipfile
 from io import BytesIO
 from moviepy import VideoFileClip, TextClip, CompositeVideoClip, AudioFileClip, CompositeAudioClip, ImageClip
+
 import whisper
 from itertools import cycle
 from PIL import Image, ImageDraw, ImageFont
@@ -149,6 +150,7 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
         font_path (str): Path to the font
         video_width (int): Width of the video
         config (dict): Configuration dictionary
+        current_color (str): Current color from the color cycle for non-highlighted words
         
     Returns:
         ImageClip: A clip with the current word highlighted
@@ -165,22 +167,24 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
     margin = tuple(config["margin"])
     text_align = config["text_align"]
     
+    # Check if font_size is "auto" and calculate appropriate size based on video width
+    if isinstance(font_size, str) and font_size.lower() == "auto":
+        # Calculate a reasonable font size based on video width
+        # This formula can be adjusted based on preference
+        font_size = max(int(video_width / 10), 36)  # Min size of 24px
+        font_size = min(font_size, 160)  # Max size of 120px
+        print(f"Auto font size calculated: {font_size}px")
+    
     # Load the font with fallback mechanism
     font = load_font_with_fallback(font_path, font_size)
-    
-    # Debug: Check if all words can be rendered with this font
-    for word in word_buffer:
-        for char in word:
-            try:
-                if hasattr(font, 'getbbox') and font.getbbox(char) is None:
-                    print(f"Warning: Character '{char}' (Unicode {ord(char)}) not supported in font")
-            except:
-                # Some older PIL versions might not have getbbox
-                pass
     
     # Calculate text size for layout
     text = " ".join(word_buffer)
     text_width, text_height = 0, 0
+    
+    # Calculate word spacing based on font size
+    # This creates better spacing between words (20% of font size)
+    word_spacing = int(font_size * 0.25)
     
     # Need to measure each word
     word_positions = []
@@ -200,8 +204,8 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
             print(f"Error measuring text: {e}")
             word_width, word_height = 100 * len(word), 100  # Rough estimate
         
-        # Add some padding
-        word_width += 10
+        # Add proper spacing between words
+        word_width += word_spacing
         
         # Update text dimensions
         text_width += word_width
@@ -212,16 +216,35 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
         current_x += word_width
     
     # Create image with proper size (add padding)
-    padding = 40
+    padding = margin[0]  # Use margin from config
     img_width = text_width + (padding * 2)
     img_height = text_height + (padding * 2)
     
-    # Create transparent image
-    img = Image.new('RGBA', (img_width, img_height), (0, 0, 0, 0))
+    # Handle background color
+    bg_rgba = (0, 0, 0, 0)  # Transparent default
+    if bg_color and bg_color.lower() != "none":
+        # Parse hex color with alpha
+        if bg_color.startswith("#"):
+            bg_color = bg_color.lstrip("#")
+            if len(bg_color) == 6:
+                r, g, b = tuple(int(bg_color[i:i+2], 16) for i in (0, 2, 4))
+                bg_rgba = (r, g, b, 255)
+            elif len(bg_color) == 8:
+                r, g, b, a = tuple(int(bg_color[i:i+2], 16) for i in (0, 2, 4, 6))
+                bg_rgba = (r, g, b, a)
+    
+    # Create image with proper background
+    img = Image.new('RGBA', (img_width, img_height), bg_rgba)
     draw = ImageDraw.Draw(img)
     
-    # Calculate center position
-    center_x = (img_width - text_width) // 2
+    # Handle text alignment
+    if text_align == "center":
+        center_x = (img_width - text_width) // 2
+    elif text_align == "right":
+        center_x = img_width - text_width - padding
+    else:  # left alignment
+        center_x = padding
+        
     center_y = (img_height - text_height) // 2
     
     # Draw each word
@@ -229,16 +252,16 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
         x = center_x + x_offset
         y = center_y
         
-        # Use highlight color for current word, white for others
+        # Use highlight color for current word, current cycling color for others
         color = highlight_color if i == current_index else "#FFFFFF"
         
-        # Draw text with black outline
-        # Outline
-        shadow_offset = 3
-        for dx in [-shadow_offset, 0, shadow_offset]:
-            for dy in [-shadow_offset, 0, shadow_offset]:
-                if dx != 0 or dy != 0:  # Skip the center position
-                    draw.text((x + dx, y + dy), word, font=font, fill="#000000")
+        # Draw text with outline as configured
+        if stroke_width > 0:
+            # Draw outline/stroke - use more points for smoother stroke
+            for dx in range(-stroke_width, stroke_width + 1, max(1, stroke_width // 3)):
+                for dy in range(-stroke_width, stroke_width + 1, max(1, stroke_width // 3)):
+                    if dx != 0 or dy != 0:  # Skip the center position
+                        draw.text((x + dx, y + dy), word, font=font, fill=stroke_color)
         
         # Main text
         draw.text((x, y), word, font=font, fill=color)
@@ -257,8 +280,7 @@ def create_highlighted_word_clip(word_buffer, current_index, font_path, video_wi
 
 def make_zoom_transform(duration, enabled=True):
     """
-    Create a zoom transform function for animations.
-    Returns original frame if transitions are disabled.
+    Fixed zoom transform function that properly preserves transparency.
     
     Args:
         duration (float): Duration of the transition
@@ -271,33 +293,90 @@ def make_zoom_transform(duration, enabled=True):
         # If transitions are disabled, just return the frame
         if not enabled:
             return get_frame(t)
-            
+        
         # Calculate the scale factor based on time
-        transition_duration = duration * 0.2  # 20% of the total duration
+        transition_duration = min(duration * 0.4, 0.5)  # Cap at 0.5 seconds
+        
         if t < transition_duration:
-            scale = 0.5 + (0.5 * (t / transition_duration))
+            # Smooth easing function
+            progress = t / transition_duration
+            # Cubic easing
+            eased_progress = progress * progress * (3 - 2 * progress)
+            # Start at 50% size and grow to 100%
+            scale = 0.5 + (0.5 * eased_progress)
         else:
+            # After transition, use full scale
             scale = 1.0
+        
+        # If scale is 1.0, return the original frame unchanged
+        if scale >= 0.99:
+            return get_frame(t)
             
         # Get the frame
         frame = get_frame(t)
+        
+        # Check if frame is valid
+        if frame is None or frame.size == 0 or len(frame.shape) < 2:
+            return frame
+        
+        # CRITICAL: Check if we have an alpha channel (RGBA)
+        has_alpha = len(frame.shape) == 3 and frame.shape[2] == 4
+        
+        # Get dimensions
         h, w = frame.shape[:2]
+        # Calculate new dimensions
         new_h, new_w = int(h * scale), int(w * scale)
         
-        # Convert numpy array to PIL Image for resizing
-        pil_img = Image.fromarray(frame)
-        resized_img = pil_img.resize((new_w, new_h), Image.LANCZOS)
-        resized = np.array(resized_img)
+        # IMPORTANT: Create a fully transparent background
+        # This is the key fix - ensure we have proper alpha transparency
+        if has_alpha:
+            # Create fully transparent RGBA array (all zeros)
+            result = np.zeros((h, w, 4), dtype=frame.dtype)
+        else:
+            # For RGB, use black background
+            result = np.zeros((h, w, 3), dtype=frame.dtype)
         
-        # Create a background frame of the original size
-        result = np.zeros((h, w, frame.shape[2]), dtype=frame.dtype)
-        
-        # Center the resized frame
+        # Calculate offsets to center the smaller frame
         y_offset = (h - new_h) // 2
         x_offset = (w - new_w) // 2
-        result[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized
         
-        return result
+        try:
+            # Use PIL for high-quality resizing
+            from PIL import Image
+            
+            # Convert to PIL Image ensuring alpha channel is preserved
+            if has_alpha:
+                # Ensure all 4 channels are preserved
+                pil_img = Image.fromarray(frame, 'RGBA')
+            else:
+                pil_img = Image.fromarray(frame)
+            
+            # Use LANCZOS for high quality resize
+            resized_img = pil_img.resize((new_w, new_h), Image.LANCZOS)
+            
+            # Convert back to numpy with correct mode
+            resized_frame = np.array(resized_img)
+            
+            # Place resized frame in the center of the transparent background
+            if y_offset >= 0 and x_offset >= 0 and y_offset + new_h <= h and x_offset + new_w <= w:
+                result[y_offset:y_offset+new_h, x_offset:x_offset+new_w] = resized_frame
+            else:
+                # Safe placement with bounds checking
+                for i in range(new_h):
+                    if y_offset + i < 0 or y_offset + i >= h:
+                        continue
+                    for j in range(new_w):
+                        if x_offset + j < 0 or x_offset + j >= w:
+                            continue
+                        if i < resized_frame.shape[0] and j < resized_frame.shape[1]:
+                            result[y_offset + i, x_offset + j] = resized_frame[i, j]
+            
+            return result
+            
+        except Exception as e:
+            print(f"Error in transform: {e}")
+            # Return original frame on error
+            return frame
     
     return transform_function
 
@@ -549,8 +628,9 @@ def load_config(config_file="config.toml"):
                 print(f"Warning: 'number_of_words' must be at least 1, setting to 1")
                 config["number_of_words"] = 1
             
-            if config["font_size"] < 10 or config["font_size"] > 500:
-                print(f"Warning: 'font_size' must be between 10 and 500, clamping to valid range")
+            # Font size can now be "auto" or an integer
+            if not isinstance(config["font_size"], str) and (config["font_size"] < 10 or config["font_size"] > 500):
+                print(f"Warning: 'font_size' must be between 10 and 500 or 'auto', clamping to valid range")
                 config["font_size"] = max(10, min(500, config["font_size"]))
                 
             # valid_positions = ["top", "center", "bottom"]
@@ -780,7 +860,7 @@ def add_captions_to_video(input_video_path, output_path=None, config_path="confi
                 duration = group_end - group_start
                 
                 # For highlighting, we need to use a custom approach with PIL
-                if config["highlight"] and config["number_of_words"] > 1:
+                if config["highlight"]:
                     
                     for i in range(len(word_buffer)):
                         word_start = word_start_times[i]
@@ -808,32 +888,29 @@ def add_captions_to_video(input_video_path, output_path=None, config_path="confi
                         
                         subtitle_clips.append(txt_clip)
                 else:
-                    # Standard case: single clip for all words
+                    # Standard case - single text clip for all words
                     color = next(colors)
-                    
-                    # Create a TextClip with all the configured properties
-                    txt_clip = TextClip(
-                        font=font_path,
-                        text=" ".join(word_buffer),
-                        font_size=config["font_size"],
-                        size=(video.w, None),
-                        color=color,
-                        stroke_color=config["stroke_color"],
-                        stroke_width=config["stroke_width"],
-                        method='caption',
-                        bg_color=config["bg_color"],
-                        margin=tuple(config["margin"]),
-                        text_align=config["text_align"]
+
+                    # For consistent handling of stroke, we'll use the same approach as in highlight mode
+                    # Create custom text clip with PIL/pillow to ensure stroke is handled properly
+                    words_joined = " ".join(word_buffer)
+                    custom_txt_clip = create_highlighted_word_clip(
+                        [words_joined],  # Put the entire text as a single "word" 
+                        0,               # Current index (always 0 since there's only one "word")
+                        font_path, 
+                        video.w, 
+                        config,
+                        color            # Current color
                     )
-                    
+
                     # Add zoom animation if transitions are enabled
-                    txt_clip = txt_clip.transform(make_zoom_transform(duration, config["transition"]))
-                    
+                    custom_txt_clip = custom_txt_clip.transform(make_zoom_transform(duration, config["transition"]))
+
                     # Set timing and position
-                    txt_clip = (txt_clip
-                               .with_start(group_start)
-                               .with_duration(duration)
-                               .with_position(position))
+                    txt_clip = (custom_txt_clip
+                            .with_start(group_start)
+                            .with_duration(duration)
+                            .with_position(position))
                     
                     subtitle_clips.append(txt_clip)
                 
@@ -849,7 +926,7 @@ def add_captions_to_video(input_video_path, output_path=None, config_path="confi
             duration = group_end - group_start
             
             # For highlighting with multiple words remaining
-            if config["highlight"] and len(word_buffer) > 1:
+            if config["highlight"]:
                 
                 for i in range(len(word_buffer)):
                     word_start = word_start_times[i]
@@ -879,30 +956,27 @@ def add_captions_to_video(input_video_path, output_path=None, config_path="confi
             else:
                 # Standard case - single text clip for all words
                 color = next(colors)
-                
-                # Create a TextClip with all the configured properties
-                txt_clip = TextClip(
-                    font=font_path,
-                    text=" ".join(word_buffer),
-                    font_size=config["font_size"],
-                    size=(video.w, None),
-                    color=color,
-                    stroke_color=config["stroke_color"],
-                    stroke_width=config["stroke_width"],
-                    method='caption',
-                    bg_color=config["bg_color"],
-                    margin=tuple(config["margin"]),
-                    text_align=config["text_align"]
+
+                # For consistent handling of stroke, we'll use the same approach as in highlight mode
+                # Create custom text clip with PIL/pillow to ensure stroke is handled properly
+                words_joined = " ".join(word_buffer)
+                custom_txt_clip = create_highlighted_word_clip(
+                    [words_joined],  # Put the entire text as a single "word" 
+                    0,               # Current index (always 0 since there's only one "word")
+                    font_path, 
+                    video.w, 
+                    config,
+                    color            # Current color
                 )
-                
+
                 # Add zoom animation if transitions are enabled
-                txt_clip = txt_clip.transform(make_zoom_transform(duration, config["transition"]))
-                
+                custom_txt_clip = custom_txt_clip.transform(make_zoom_transform(duration, config["transition"]))
+
                 # Set timing and position
-                txt_clip = (txt_clip
-                           .with_start(group_start)
-                           .with_duration(duration)
-                           .with_position(position))
+                txt_clip = (custom_txt_clip
+                        .with_start(group_start)
+                        .with_duration(duration)
+                        .with_position(position))
                 
                 subtitle_clips.append(txt_clip)
 
