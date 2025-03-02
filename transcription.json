@@ -1,0 +1,355 @@
+{
+  "text": " I'm trying to fucking write some shit Not going to well it might it might chop this shit or is this just me? Is it is it is it is it is it really the right thing to do? I don't know",
+  "segments": [
+    {
+      "id": 0,
+      "seek": 0,
+      "start": 0.0,
+      "end": 2.68,
+      "text": " I'm trying to fucking write some shit",
+      "tokens": [
+        50364,
+        286,
+        478,
+        1382,
+        281,
+        5546,
+        2464,
+        512,
+        4611,
+        50497
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.35716197175799674,
+      "compression_ratio": 1.547008547008547,
+      "no_speech_prob": 0.32382988929748535,
+      "words": [
+        {
+          "word": " I'm",
+          "start": 0.0,
+          "end": 0.52,
+          "probability": 0.691765770316124
+        },
+        {
+          "word": " trying",
+          "start": 0.52,
+          "end": 0.64,
+          "probability": 0.9237124919891357
+        },
+        {
+          "word": " to",
+          "start": 0.64,
+          "end": 1.0,
+          "probability": 0.9199160933494568
+        },
+        {
+          "word": " fucking",
+          "start": 1.0,
+          "end": 1.32,
+          "probability": 0.8086538314819336
+        },
+        {
+          "word": " write",
+          "start": 1.32,
+          "end": 2.14,
+          "probability": 0.6876463890075684
+        },
+        {
+          "word": " some",
+          "start": 2.14,
+          "end": 2.4,
+          "probability": 0.993447482585907
+        },
+        {
+          "word": " shit",
+          "start": 2.4,
+          "end": 2.68,
+          "probability": 0.9886566400527954
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "seek": 0,
+      "start": 4.579999999999999,
+      "end": 10.04,
+      "text": " Not going to well it might it might chop this shit or is this just me?",
+      "tokens": [
+        50606,
+        1726,
+        516,
+        281,
+        731,
+        309,
+        1062,
+        309,
+        1062,
+        7931,
+        341,
+        4611,
+        420,
+        307,
+        341,
+        445,
+        385,
+        30,
+        50866
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.35716197175799674,
+      "compression_ratio": 1.547008547008547,
+      "no_speech_prob": 0.32382988929748535,
+      "words": [
+        {
+          "word": " Not",
+          "start": 4.579999999999999,
+          "end": 5.06,
+          "probability": 0.19766196608543396
+        },
+        {
+          "word": " going",
+          "start": 5.06,
+          "end": 5.54,
+          "probability": 0.9769446849822998
+        },
+        {
+          "word": " to",
+          "start": 5.54,
+          "end": 5.74,
+          "probability": 0.6112633943557739
+        },
+        {
+          "word": " well",
+          "start": 5.74,
+          "end": 6.02,
+          "probability": 0.8641449213027954
+        },
+        {
+          "word": " it",
+          "start": 6.02,
+          "end": 6.92,
+          "probability": 0.1337851881980896
+        },
+        {
+          "word": " might",
+          "start": 6.92,
+          "end": 7.08,
+          "probability": 0.9379633069038391
+        },
+        {
+          "word": " it",
+          "start": 7.08,
+          "end": 7.3,
+          "probability": 0.7686713337898254
+        },
+        {
+          "word": " might",
+          "start": 7.3,
+          "end": 7.4,
+          "probability": 0.9865823984146118
+        },
+        {
+          "word": " chop",
+          "start": 7.4,
+          "end": 7.74,
+          "probability": 0.7329068779945374
+        },
+        {
+          "word": " this",
+          "start": 7.74,
+          "end": 7.98,
+          "probability": 0.7413954734802246
+        },
+        {
+          "word": " shit",
+          "start": 7.98,
+          "end": 8.3,
+          "probability": 0.9941180944442749
+        },
+        {
+          "word": " or",
+          "start": 8.3,
+          "end": 8.62,
+          "probability": 0.5675203800201416
+        },
+        {
+          "word": " is",
+          "start": 8.62,
+          "end": 8.86,
+          "probability": 0.8203902840614319
+        },
+        {
+          "word": " this",
+          "start": 8.86,
+          "end": 9.02,
+          "probability": 0.6341280341148376
+        },
+        {
+          "word": " just",
+          "start": 9.02,
+          "end": 9.18,
+          "probability": 0.9455277919769287
+        },
+        {
+          "word": " me?",
+          "start": 9.18,
+          "end": 10.04,
+          "probability": 0.5617005228996277
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "seek": 0,
+      "start": 11.56,
+      "end": 16.42,
+      "text": " Is it is it is it is it is it really the right thing to do? I don't know",
+      "tokens": [
+        50938,
+        1119,
+        309,
+        307,
+        309,
+        307,
+        309,
+        307,
+        309,
+        307,
+        309,
+        534,
+        264,
+        558,
+        551,
+        281,
+        360,
+        30,
+        286,
+        500,
+        380,
+        458,
+        51184
+      ],
+      "temperature": 0.0,
+      "avg_logprob": -0.35716197175799674,
+      "compression_ratio": 1.547008547008547,
+      "no_speech_prob": 0.32382988929748535,
+      "words": [
+        {
+          "word": " Is",
+          "start": 11.56,
+          "end": 12.04,
+          "probability": 0.9225887656211853
+        },
+        {
+          "word": " it",
+          "start": 12.04,
+          "end": 12.26,
+          "probability": 0.9728208780288696
+        },
+        {
+          "word": " is",
+          "start": 12.26,
+          "end": 12.4,
+          "probability": 0.2561306357383728
+        },
+        {
+          "word": " it",
+          "start": 12.4,
+          "end": 12.94,
+          "probability": 0.917446494102478
+        },
+        {
+          "word": " is",
+          "start": 12.94,
+          "end": 13.1,
+          "probability": 0.4494393765926361
+        },
+        {
+          "word": " it",
+          "start": 13.1,
+          "end": 13.26,
+          "probability": 0.9466552138328552
+        },
+        {
+          "word": " is",
+          "start": 13.26,
+          "end": 13.34,
+          "probability": 0.5190471410751343
+        },
+        {
+          "word": " it",
+          "start": 13.34,
+          "end": 13.34,
+          "probability": 0.9659585356712341
+        },
+        {
+          "word": " is",
+          "start": 13.34,
+          "end": 13.6,
+          "probability": 0.4300195574760437
+        },
+        {
+          "word": " it",
+          "start": 13.6,
+          "end": 13.68,
+          "probability": 0.9705453515052795
+        },
+        {
+          "word": " really",
+          "start": 13.68,
+          "end": 13.88,
+          "probability": 0.7196446061134338
+        },
+        {
+          "word": " the",
+          "start": 13.88,
+          "end": 14.12,
+          "probability": 0.9663804769515991
+        },
+        {
+          "word": " right",
+          "start": 14.12,
+          "end": 14.3,
+          "probability": 0.9926032423973083
+        },
+        {
+          "word": " thing",
+          "start": 14.3,
+          "end": 15.08,
+          "probability": 0.9686828851699829
+        },
+        {
+          "word": " to",
+          "start": 15.08,
+          "end": 15.3,
+          "probability": 0.9890102744102478
+        },
+        {
+          "word": " do?",
+          "start": 15.3,
+          "end": 15.46,
+          "probability": 0.7918347120285034
+        },
+        {
+          "word": " I",
+          "start": 15.82,
+          "end": 16.18,
+          "probability": 0.9514251351356506
+        },
+        {
+          "word": " don't",
+          "start": 16.18,
+          "end": 16.28,
+          "probability": 0.9538694024085999
+        },
+        {
+          "word": " know",
+          "start": 16.28,
+          "end": 16.42,
+          "probability": 0.9980915188789368
+        }
+      ]
+    }
+  ],
+  "language": "en"
+}

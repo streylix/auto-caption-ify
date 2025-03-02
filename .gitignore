@@ -74,3 +74,6 @@ htmlcov/
 .coverage.*
 coverage.xml
 *.cover
+known-bugs.txt
+formats
+fonts

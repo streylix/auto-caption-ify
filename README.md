@@ -1,112 +1,152 @@
 # Video Caption Generator
 
-A Python script that automatically adds animated captions to videos using speech recognition. The captions appear with a zoom animation effect and cycle through different colors for better visibility.
+A Python script that automatically adds animated captions to videos using speech recognition, with extensive customization options.
 
 ## Features
 
-- Automatic speech-to-text transcription using OpenAI's Whisper model
-- Word-by-word animated captions with zoom effects
-- Color cycling for better visibility (alternates between light blue, light green, and gold)
-- Centered text positioning with black outline for readability
-- Support for custom input and output paths
+- **Automatic Captioning**
+  - Uses OpenAI's Whisper model for speech-to-text transcription
+  - Word-by-word or multi-word animated captions
+  - Customizable zoom animation effects
+
+- **Styling Options**
+  - Color cycling for captions
+  - Configurable font, size, and positioning
+  - Text stroke and background options
+  - Highlight individual words
+
+- **Advanced Video Editing**
+  - Optional intro sound
+  - Video overlay support
+  - Flexible caption placement
 
 ## Prerequisites
 
 - Python 3.8 or higher
-- FFmpeg installed on your system (required for video processing)
+- FFmpeg installed on your system
+- GPU recommended for faster processing (optional)
 
 ## Installation
 
-1. Clone this repository:
+1. Clone the repository:
 ```bash
 git clone <repository-url>
 cd video-caption-generator
 ```
 
-2. Install the required dependencies:
+2. Install dependencies:
 ```bash
-pip install -r requirements.txt
+pip install moviepy whisper PyYAML requests fonttools pillow
 ```
 
-3. Download the Roboto-Black font and place it in a `fonts` directory:
-```bash
-mkdir fonts
-# Place Roboto-Black.ttf in the fonts directory
-```
+## Font Management with `fontify.py`
 
-## Usage
-
-### Basic Usage
+The `fontify.py` script provides an easy way to download fonts from Google Fonts:
 
 ```bash
-python caption_generator.py input_video.mp4
+# Download a specific font
+python fontify.py "Open Sans"
+# Or
+python fontify.py "Roboto Black"
 ```
 
-This will create a captioned video with the default output name `output_captioned.mp4`.
-
-### Specifying Output File
-
-```bash
-python caption_generator.py input_video.mp4 --output_file custom_output.mp4
-```
-
-### Function Usage in Code
-
-You can also import and use the captioning function in your own Python code:
-
-```python
-from caption_generator import add_captions_to_video
-
-add_captions_to_video("input_video.mp4", "output_video.mp4")
-```
+This script will:
+- Query the Google Fonts API
+- Download the font file
+- Save it in a `./fonts` directory
 
 ## Configuration
 
-The script includes several hardcoded settings that you can modify in the code:
+Configuration is managed through a `config.toml` file with numerous options:
 
-- Font size: Currently set to 100
-- Text colors: Cycles through '#00BFFF' (light blue), '#90EE90' (light green), and '#FFD700' (gold)
-- Stroke width: Set to 6 pixels
-- Text margin: Set to 40 pixels
-- Zoom animation duration: 20% of each word's duration
+### Caption Display
+- `number_of_words`: Number of words to display at once
+- `font`: Font filename
+- `font_size`: Text size in pixels
+- `position`: Screen position (top/center/bottom)
+- `text_align`: Text alignment
+- `text_colors`: Color cycling for captions
+- `stroke_color` and `stroke_width`: Text outline styling
+- `bg_color`: Background color or transparency
 
-## Technical Details
+### Advanced Options
+- `transition`: Zoom animation toggle
+- `highlight`: Highlight current word
+- `has_intro_sound`: Add background audio
+- `overlay`: Overlay another video
 
-The script works by:
-1. Extracting audio from the input video
-2. Using Whisper to transcribe the audio with word-level timestamps
-3. Creating animated text clips for each word
-4. Applying a zoom transform effect to each word
-5. Compositing all clips together with the original video
-6. Saving the final video with the original audio
+## Usage
 
-## Limitations
+### Command Line
+```bash
+# Basic usage
+python caption.py input_video.mp4
 
-- Processing time depends on video length and system capabilities
-- Requires sufficient disk space for temporary files
-- Whisper model accuracy may vary based on audio quality
-- Memory usage scales with video resolution and length
+# Specify output and configuration
+python caption.py input_video.mp4 --output_file captioned_video.mp4 --config custom_config.toml
+```
+
+### Programmatic Usage
+```python
+from caption import add_captions_to_video
+
+add_captions_to_video(
+    "input_video.mp4", 
+    output_path="output_video.mp4", 
+    config_path="config.toml"
+)
+```
+
+## Video Silence Trimmer
+
+Included `silence_trimmer.py` allows removing silent segments from videos:
+
+```bash
+python silence_trimmer.py input_video.mp4
+```
 
 ## Troubleshooting
 
-Common issues and solutions:
+1. **Font Issues**
+   - Use `fontify.py` to download missing fonts
+   - Ensure fonts are in the `./fonts` directory
 
-1. **FFmpeg not found error**:
-   - Ensure FFmpeg is installed on your system and accessible in your PATH
+2. **Performance**
+   - Use smaller Whisper models for faster processing
+   - Reduce video resolution if memory is limited
 
-2. **Font not found error**:
-   - Make sure Roboto-Black.ttf is present in the `fonts` directory
+3. **Dependencies**
+   - Ensure all required libraries are installed
+   - Check FFmpeg installation
 
-3. **Memory errors**:
-   - Try processing shorter video segments
-   - Reduce video resolution before processing
+## Customization Tips
+
+- Experiment with `config.toml` settings
+- Try different fonts using `fontify.py`
+- Adjust Whisper model for accuracy vs. speed
+
+## Technologies Used
+
+- MoviePy: Video processing
+- Whisper: Speech recognition
+- PIL (Pillow): Image manipulation
+- TOML: Configuration management
 
 ## License
 
-Roboto Fonts are licensed under Apache License V2
+- Apache License 2.0 (for Roboto Fonts)
+- MIT License for the script
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a pull request
 
 ## Credits
 
-- Uses OpenAI's Whisper model for speech recognition
-- MoviePy for video processing
-- Roboto font by Google Fonts
+- OpenAI (Whisper)
+- Google Fonts
+- MoviePy Developers

@@ -1,0 +1,94 @@
+# Caption display options
+# -----------------------------------------------------------------
+# number_of_words: Integer (1 or greater)
+#   Number of words to show at once
+number_of_words = 1
+
+# font: String
+#   Font filename (must be in the 'fonts' directory)
+#   e.g., "Roboto-Black.ttf", "Arial.ttf", "OpenSans-Bold.ttf"
+font = "andy"
+
+# font_size: Integer
+#   Size of the font in pixels
+font_size = 100
+
+# position: Flexible positioning
+#   Can be one of:
+#   - Predefined strings: "top", "bottom", "center", 
+#                         "top-left", "top-right", 
+#                         "bottom-left", "bottom-right"
+#   - List/Tuple with two values:
+#     * Percentages: 0.5, 0.2, "50%" or "20%"
+#     * Pixel values: 100, 200
+#     * Mixed values: 0.5, 200 or "50%", 200
+position = [0, 0.6]  # Example: 80% from the top
+
+# text_align: String
+#   Text alignment within the caption box
+#   Valid values: "left", "center", "right"
+text_align = "left"
+
+# text_colors: Array of hex color codes
+#   Colors to cycle through for text
+#   e.g., ["#FF0000", "#00FF00", "#0000FF"] for red, green, blue
+text_colors = ["#00BFFF", "#90EE90", "#FFD700"]
+
+# stroke_color: String (hex color code)
+#   Color of the text outline/stroke
+stroke_color = "#000000"
+
+# stroke_width: Integer
+#   Width of the text outline/stroke in pixels
+stroke_width = 6
+
+# bg_color: String (hex color code or "none")
+#   Background color for caption text
+#   Use "none" for transparent background
+bg_color = "none"
+
+# margin: Array of two integers [x, y]
+#   Horizontal and vertical padding around text in pixels
+margin = [40, 40]
+
+# transition: Boolean
+#   Whether to use the zoom-in transition effect for new captions
+transition = false
+
+# Highlight options
+# -----------------------------------------------------------------
+# highlight: Boolean
+#   Whether to highlight the current word
+#   Only applies when number_of_words > 1
+highlight = false
+
+# highlight_color: Hex color code
+#   Color for highlighted word
+#   e.g., "#FFFF00" for yellow
+highlight_color = "#FFFF00"
+
+# Sound configuration
+# -----------------------------------------------------------------
+# has_intro_sound: Boolean
+#   Whether to play an intro sound
+has_intro_sound = true
+
+# intro_sound: String
+#   Path to intro sound file
+#   Supported formats: .mp3, .wav, .aac
+intro_sound = "disc.mp3"
+
+# Overlay configuration
+# -----------------------------------------------------------------
+# overlay: Boolean
+#   Whether to overlay another video
+overlay = false
+
+# overlay_video: String
+#   Path to overlay video file
+overlay_video = ""
+
+# overlay_opacity: Float (0.0 to 1.0)
+#   Opacity of overlay video
+#   0.0 = completely transparent, 1.0 = completely opaque
+overlay_opacity = 0.5
